@@ -166,21 +166,22 @@ export default function Header({
           <span style={{ fontSize: '9px', color: 'var(--text-subtle)', marginLeft: '2px' }}>▼</span>
         </button>
 
-        {/* Spotlight Command Palette Trigger (Linear/Raycast style) */}
+        {/* Spotlight Command Palette Trigger */}
         <button
           onClick={onOpenCommandMenu}
           className="glass-pill hide-small"
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '8px',
-            padding: '5px 12px',
+            gap: '6px',
+            padding: '5px 10px',
             fontSize: '12px',
             color: 'var(--text-muted)',
             border: '1px solid var(--border-subtle)',
             background: 'rgba(0, 0, 0, 0.25)',
             transition: 'all 0.2s ease',
-            cursor: 'pointer'
+            cursor: 'pointer',
+            flexShrink: 0
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.borderColor = 'var(--border-focus)';
@@ -195,7 +196,7 @@ export default function Header({
           title="Open Command Menu (⌘K or Ctrl+K)"
         >
           <Search size={13} color="var(--accent-glow)" />
-          <span style={{ fontSize: '11.5px', fontWeight: 500 }}>Commands...</span>
+          <span className="hide-medium" style={{ fontSize: '11.5px', fontWeight: 500 }}>Commands</span>
           <kbd style={{
             fontFamily: 'var(--font-mono)',
             fontSize: '10px',
@@ -218,23 +219,24 @@ export default function Header({
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            padding: '5px 10px',
+            padding: '5px 11px',
             border: musicState.isPlaying ? '1px solid var(--border-focus)' : '1px solid var(--border-subtle)',
             cursor: 'pointer',
             transition: 'all 0.2s ease',
             background: musicState.isPlaying ? 'rgba(139, 92, 246, 0.12)' : 'var(--bg-glass)',
-            minWidth: 0
+            flexShrink: 0,
+            userSelect: 'none'
           }}
           title="Click to open Music & Ambience Hub"
         >
           <span style={{ fontSize: '13px', flexShrink: 0 }}>{musicState.currentStation.icon}</span>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <span style={{ 
               fontSize: '11.5px', 
               fontWeight: 600, 
               color: 'var(--text-main)', 
-              maxWidth: '110px', 
+              maxWidth: '120px', 
               whiteSpace: 'nowrap', 
               overflow: 'hidden', 
               textOverflow: 'ellipsis' 
@@ -291,123 +293,25 @@ export default function Header({
               display: 'flex',
               alignItems: 'center',
               gap: '5px',
-              padding: '6px 10px',
+              padding: '6px 9px',
               borderRadius: 'var(--radius-md)',
               background: 'rgba(34, 197, 94, 0.12)',
               border: '1px solid rgba(34, 197, 94, 0.3)',
               color: '#4ade80',
               fontSize: '11.5px',
-              fontWeight: 700
+              fontWeight: 700,
+              flexShrink: 0
             }}
           >
             <Download size={13} />
-            <span className="hide-small">Install</span>
+            <span className="hide-medium">Install</span>
           </button>
         )}
 
-        {/* Desk Mode Button */}
-        <button
-          onClick={onOpenDeskMode}
-          title="Aesthetic Desk Setup Clock (Press D)"
-          className="hide-mobile"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '5px',
-            padding: '6px 11px',
-            borderRadius: 'var(--radius-md)',
-            background: 'var(--bg-surface)',
-            color: 'var(--text-muted)',
-            border: '1px solid var(--border-subtle)',
-            fontSize: '11.5px',
-            fontWeight: 600,
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.color = 'var(--text-main)';
-            e.currentTarget.style.borderColor = 'var(--border-focus)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.color = 'var(--text-muted)';
-            e.currentTarget.style.borderColor = 'var(--border-subtle)';
-          }}
-        >
-          <Monitor size={14} />
-          <span>Desk (D)</span>
-        </button>
-
-        {/* Notion Widget Modal Button */}
-        <button
-          onClick={onOpenNotionModal}
-          title="Embed into Notion / Obsidian"
-          className="hide-small"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '5px',
-            padding: '6px 11px',
-            borderRadius: 'var(--radius-md)',
-            background: 'var(--bg-surface)',
-            color: 'var(--text-muted)',
-            border: '1px solid var(--border-subtle)',
-            fontSize: '11.5px',
-            fontWeight: 600,
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.color = 'var(--text-main)';
-            e.currentTarget.style.borderColor = 'var(--border-focus)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.color = 'var(--text-muted)';
-            e.currentTarget.style.borderColor = 'var(--border-subtle)';
-          }}
-        >
-          <Layout size={14} />
-          <span>Notion</span>
-        </button>
-
-        {/* Consistency & Badges Button */}
-        <button
-          onClick={onOpenBadgesModal}
-          title="Consistency & Badges"
-          style={{
-            padding: '7px',
-            borderRadius: 'var(--radius-md)',
-            background: 'var(--bg-surface)',
-            color: '#fbbf24',
-            border: '1px solid var(--border-subtle)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Award size={15} />
-        </button>
-
-        {/* Soundboard modal trigger button */}
-        <button
-          onClick={onOpenSoundMixer}
-          title="Open Focus Music & Soundboard"
-          style={{
-            padding: '7px',
-            borderRadius: 'var(--radius-md)',
-            background: 'var(--bg-surface)',
-            color: 'var(--text-muted)',
-            border: '1px solid var(--border-subtle)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--text-main)'}
-          onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-muted)'}
-        >
-          <Music2 size={15} />
-        </button>
-
-        {/* Ambience Mute button */}
+        {/* Ambience Mute / Audio button */}
         <button
           onClick={onToggleMute}
           title={isAudioMuted ? "Unmute Ambient Mixer" : "Mute Ambience"}
-          className="hide-small"
           style={{
             padding: '7px',
             borderRadius: 'var(--radius-md)',
@@ -417,8 +321,9 @@ export default function Header({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            flexShrink: 0
           }}
-          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--text-main)'}
+          onMouseEnter={(e) => e.currentTarget.style.color = isAudioMuted ? '#ef4444' : 'var(--text-main)'}
           onMouseLeave={(e) => e.currentTarget.style.color = isAudioMuted ? '#ef4444' : 'var(--text-muted)'}
         >
           {isAudioMuted ? <VolumeX size={15} /> : <Volume2 size={15} />}
@@ -432,13 +337,14 @@ export default function Header({
             display: 'flex',
             alignItems: 'center',
             gap: '5px',
-            padding: '6px 11px',
+            padding: '6px 10px',
             borderRadius: 'var(--radius-md)',
             background: 'var(--bg-surface)',
             color: 'var(--text-muted)',
             border: '1px solid var(--border-subtle)',
             fontSize: '11.5px',
             fontWeight: 600,
+            flexShrink: 0
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.color = 'var(--text-main)';
@@ -450,7 +356,7 @@ export default function Header({
           }}
         >
           <Share2 size={14} />
-          <span className="hide-small">Share</span>
+          <span className="hide-tablet">Share</span>
         </button>
 
         {/* Fullscreen Button */}
@@ -467,32 +373,12 @@ export default function Header({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            flexShrink: 0
           }}
           onMouseEnter={(e) => e.currentTarget.style.color = 'var(--text-main)'}
           onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-muted)'}
         >
           <Maximize size={15} />
-        </button>
-
-        {/* Keyboard Shortcuts Cheatsheet Trigger */}
-        <button
-          onClick={onOpenShortcutsModal}
-          title="Keyboard Shortcuts (?)"
-          className="hide-small"
-          style={{
-            padding: '7px',
-            borderRadius: 'var(--radius-md)',
-            background: 'var(--bg-surface)',
-            color: 'var(--text-muted)',
-            border: '1px solid var(--border-subtle)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--text-main)'}
-          onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-muted)'}
-        >
-          <Keyboard size={15} />
         </button>
 
         {/* User Account / Cloud Sync Pill */}
@@ -519,11 +405,12 @@ export default function Header({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 0 8px rgba(45, 212, 191, 0.35)'
+              boxShadow: '0 0 8px rgba(45, 212, 191, 0.35)',
+              flexShrink: 0
             }}>
               {(user.displayName || user.email || 'U')[0].toUpperCase()}
             </div>
-            <div className="hide-small" style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.15 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.15 }}>
               <span style={{ fontSize: '11.5px', fontWeight: 700, color: 'var(--text-main)', maxWidth: '90px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {user.displayName || user.email.split('@')[0]}
               </span>
@@ -604,6 +491,7 @@ export default function Header({
             border: '1px solid var(--border-glow)',
             fontSize: '11.5px',
             fontWeight: 700,
+            flexShrink: 0
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = 'translateY(-1px)';
@@ -615,7 +503,7 @@ export default function Header({
           }}
         >
           <HelpCircle size={14} />
-          <span className="hide-small">Tour</span>
+          <span className="hide-tablet">Tour</span>
         </button>
       </div>
     </header>

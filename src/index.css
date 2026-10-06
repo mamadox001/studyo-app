@@ -286,6 +286,18 @@ input:focus, textarea:focus {
   }
 }
 
+@media (max-width: 1180px) {
+  .hide-medium {
+    display: none !important;
+  }
+}
+
+@media (max-width: 880px) {
+  .hide-tablet {
+    display: none !important;
+  }
+}
+
 @media (max-width: 540px) {
   .hide-small {
     display: none !important;
