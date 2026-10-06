@@ -5,7 +5,11 @@ pages_build_output_dir = "dist"
 [assets]
 directory = "./dist"
 
+# =======================================================
+# Cloudflare D1 Serverless SQL Database Binding
+# 100% Free Forever: 5M reads/day, 100k writes/day, 5GB storage
+# =======================================================
 [[d1_databases]]
 binding = "DB"
 database_name = "studyo-db"
-database_id = "studyo-db"
+database_id = "f6eaf252-a9c7-46c0-88b0-7516b24ba1d4"
