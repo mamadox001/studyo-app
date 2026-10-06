@@ -397,6 +397,7 @@ export default function App() {
         onClose={() => setIsShareModalOpen(false)}
         sessions={sessions}
         stats={{ streak: 7 }}
+        user={user}
       />
 
       <OnboardingModal
