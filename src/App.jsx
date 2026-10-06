@@ -151,7 +151,9 @@ export default function App() {
     const unsubscribe = authService.subscribe((updatedUser) => {
       setUser(updatedUser);
     });
-    authService.checkMe();
+    if (typeof authService.checkMe === 'function') {
+      authService.checkMe();
+    }
     return unsubscribe;
   }, []);
 

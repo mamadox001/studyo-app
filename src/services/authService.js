@@ -47,6 +47,30 @@ class AuthService {
     this.listeners.forEach(cb => cb(this.currentUser));
   }
 
+  // Verify current session with Cloudflare or local storage
+  async checkMe() {
+    if (!this.token) return;
+    try {
+      const res = await fetch('/api/auth/me', {
+        headers: {
+          'Authorization': `Bearer ${this.token}`
+        }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.user) {
+          this.currentUser = data.user;
+          localStorage.setItem(AUTH_STORAGE_KEYS.USER, JSON.stringify(data.user));
+          this.notify();
+        }
+      } else if (res.status === 401) {
+        this.logout();
+      }
+    } catch {
+      // Offline fallback: keep current user from localStorage
+    }
+  }
+
   // ==========================================
   // Register Account (Email + Password)
   // ==========================================
