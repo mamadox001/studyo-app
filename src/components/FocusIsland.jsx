@@ -41,6 +41,14 @@ export default function FocusIsland({
 
   const timerRef = useRef(null);
   const pipVideoRef = useRef(null);
+  const pipCanvasRef = useRef(null);
+  const pipIntervalRef = useRef(null);
+  const timerStateRef = useRef({ seconds, isRunning, selectedSubject, timerMode, pomodoroTarget });
+
+  // Sync ref with live state so PiP canvas always has latest time
+  useEffect(() => {
+    timerStateRef.current = { seconds, isRunning, selectedSubject, timerMode, pomodoroTarget };
+  }, [seconds, isRunning, selectedSubject, timerMode, pomodoroTarget]);
 
   // Initialize pomodoro starting seconds
   useEffect(() => {
@@ -158,6 +166,61 @@ export default function FocusIsland({
     return `${pad(mins)}:${pad(secs)}`;
   };
 
+  // Live Picture-in-Picture canvas renderer (always reads live timer state)
+  const drawPipCanvas = () => {
+    const canvas = pipCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const { seconds: curSecs, isRunning: curRunning, selectedSubject: curSubj, timerMode: curMode, pomodoroTarget: curTarget } = timerStateRef.current;
+
+    // Background
+    ctx.fillStyle = '#0a0d14';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Subtle radial aura
+    const grad = ctx.createRadialGradient(200, 95, 10, 200, 95, 160);
+    grad.addColorStop(0, curRunning ? 'rgba(45, 212, 191, 0.15)' : 'rgba(251, 191, 36, 0.10)');
+    grad.addColorStop(1, 'rgba(10, 13, 20, 0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Subject title
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '600 15px "Plus Jakarta Sans", -apple-system, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(curSubj || 'Studyo Focus', 200, 42);
+
+    // Timer digits (JetBrains Mono / monospace)
+    ctx.fillStyle = '#f8fafc';
+    ctx.font = 'bold 62px "JetBrains Mono", monospace';
+    ctx.fillText(formatTime(curSecs), 200, 114);
+
+    // Status pill
+    ctx.fillStyle = curRunning ? '#2dd4bf' : '#fbbf24';
+    ctx.font = '600 13px "Plus Jakarta Sans", sans-serif';
+    const statusText = curRunning 
+      ? (curMode === 'pomodoro' ? '● Focused (Pomodoro)' : '● Focused (Flowmodoro)') 
+      : '⏸ Paused';
+    ctx.fillText(statusText, 200, 154);
+
+    // Progress bar track
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+    ctx.fillRect(36, 175, 328, 6);
+
+    // Progress bar fill
+    let progress = 0;
+    if (curMode === 'pomodoro' && curTarget > 0) {
+      progress = Math.min(1, Math.max(0, (curTarget - curSecs) / curTarget));
+    } else if (curMode === 'flowmodoro') {
+      progress = Math.min(1, (curSecs % 3600) / 3600);
+    }
+
+    ctx.fillStyle = curRunning ? '#2dd4bf' : '#fbbf24';
+    ctx.fillRect(36, 175, 328 * progress, 6);
+  };
+
   // Picture-in-Picture implementation using Canvas Video Stream
   const handlePictureInPicture = async () => {
     soundEngine.playClick();
@@ -167,49 +230,37 @@ export default function FocusIsland({
         return;
       }
 
-      // Create an offscreen canvas
-      const canvas = document.createElement('canvas');
-      canvas.width = 400;
-      canvas.height = 200;
-      const ctx = canvas.getContext('2d');
+      // Create or reuse offscreen canvas
+      let canvas = pipCanvasRef.current;
+      if (!canvas) {
+        canvas = document.createElement('canvas');
+        canvas.width = 400;
+        canvas.height = 200;
+        pipCanvasRef.current = canvas;
+      }
 
-      const drawPip = () => {
-        ctx.fillStyle = '#0f131a';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      drawPipCanvas();
+      const stream = canvas.captureStream(30);
 
-        // Subject text
-        ctx.fillStyle = '#94a3b8';
-        ctx.font = '600 16px "Plus Jakarta Sans", sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(selectedSubject || 'Studyo Focus', 200, 50);
-
-        // Timer
-        ctx.fillStyle = '#f8fafc';
-        ctx.font = 'bold 58px "JetBrains Mono", monospace';
-        ctx.fillText(formatTime(seconds), 200, 120);
-
-        // Status
-        ctx.fillStyle = isRunning ? '#10b981' : '#f59e0b';
-        ctx.font = '500 14px "Plus Jakarta Sans", sans-serif';
-        ctx.fillText(isRunning ? '● Focused' : '⏸ Paused', 200, 160);
-      };
-
-      drawPip();
-      const stream = canvas.captureStream(10);
-      
       let video = pipVideoRef.current;
       if (!video) {
         video = document.createElement('video');
         video.muted = true;
+        video.playsInline = true;
         pipVideoRef.current = video;
       }
       video.srcObject = stream;
       await video.play();
       await video.requestPictureInPicture();
 
-      const pipInterval = setInterval(drawPip, 500);
+      if (pipIntervalRef.current) clearInterval(pipIntervalRef.current);
+      pipIntervalRef.current = setInterval(drawPipCanvas, 250);
+
       video.addEventListener('leavepictureinpicture', () => {
-        clearInterval(pipInterval);
+        if (pipIntervalRef.current) {
+          clearInterval(pipIntervalRef.current);
+          pipIntervalRef.current = null;
+        }
       }, { once: true });
     } catch (err) {
       console.warn('PiP error', err);
